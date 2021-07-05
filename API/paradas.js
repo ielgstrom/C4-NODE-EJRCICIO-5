@@ -1,4 +1,5 @@
-require("dotenv")= config();
+require("dotenv").config();
+const fetch = require("node-fetch");
 
 const appKey = process.env.APP_KEY;
 const appId = process.env.APP_ID;
@@ -8,8 +9,19 @@ const urlAPIParadas = (linea) =>
 
 const getLineasMetro = async () => {
   const resp = await fetch(urlAPILineas);
-  const lineas = await resp.json();
-  return lineas;
+  const { features } = await resp.json();
+  return features;
+};
+
+const infoLineasMetro = async () => {
+  const properties = await getLineasMetro();
+  const nuevo = await properties.map((elemento) => ({
+    id: elemento.id,
+    descripcion: elemento.properties.DESC_LINIA,
+    nombre_linia: elemento.properties.NOM_LINIA,
+  }));
+
+  return nuevo;
 };
 
 const getParadasLinea = async (linea) => {
@@ -19,6 +31,6 @@ const getParadasLinea = async (linea) => {
 };
 
 module.exports = {
-  getLineasMetro,
+  infoLineasMetro,
   getParadasLinea,
 };
