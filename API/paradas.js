@@ -16,12 +16,29 @@ const getLineasMetro = async () => {
 const infoLineasMetro = async () => {
   const properties = await getLineasMetro();
   const nuevo = await properties.map((elemento) => ({
-    id: elemento.id,
+    id: elemento.properties.ID_LINIA,
     descripcion: elemento.properties.DESC_LINIA,
     nombre_linia: elemento.properties.NOM_LINIA,
   }));
 
   return nuevo;
+};
+
+const paradasTotales = async (linea) => {
+  const properties = await getLineasMetro();
+  const lineaFiltrada = properties.find(
+    (line) => line.properties.NOM_LINIA === linea
+  );
+  const apiParadas = urlAPIParadas(lineaFiltrada.properties.CODI_LINIA);
+  const paradasAgain = await fetch(apiParadas);
+  const paradasOtraVez = await paradasAgain.json();
+  const lineaToReturn = {
+    id: lineaFiltrada.properties.ID_LINIA,
+    descripcion: lineaFiltrada.properties.DESC_LINIA,
+    nombre_linia: lineaFiltrada.properties.NOM_LINIA,
+    paradas: paradasOtraVez.map(),
+  };
+  return lineaToReturn;
 };
 
 const getParadasLinea = async (linea) => {
@@ -33,4 +50,5 @@ const getParadasLinea = async (linea) => {
 module.exports = {
   infoLineasMetro,
   getParadasLinea,
+  paradasTotales,
 };
